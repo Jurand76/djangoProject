@@ -5,9 +5,12 @@
     <h2>Tenants</h2>
     <ul class="list-group">
         {% for tenant in tenants %}
-        <li class="list-group-item">
-            <a href="/core/dashboard/{{ tenant.id }}/">{{ tenant.domain }}</a>
-        </li>
+            <li class="list-group-item">
+                <a href="{% url 'tenant_detail' tenant.tenant_id %}">{{ tenant.domain }}</a>
+                <p>Tenant ID: {{ tenant.tenant_id }}</p>
+            </li>
+        {% empty %}
+            <p>No tenants found.</p>
         {% endfor %}
     </ul>
     <div class="mt-3">

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework import viewsets
 from core.models import Tenant, Organization, Department, Customer
 from core.serializers.tenant import TenantSerializer
@@ -9,6 +9,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from django.contrib.auth.decorators import login_required
 from django.template.loader import get_template
+from core.forms import OrganizationForm
 
 
 class TenantViewSet(viewsets.ModelViewSet):
@@ -80,3 +81,26 @@ def homepage(request):
     except Exception as e:
         print(f"Error: {e}")
     return render(request, 'core/homepage.html')
+
+def tenant_detail(request, tenant_id):
+    # Get tenant
+    tenant = get_object_or_404(Tenant, tenant_id=tenant_id)
+    # Get organizations
+    organizations = Organization.objects.filter(tenant=tenant)
+
+    # form to add new organization
+    if request.method == 'POST':
+        form = OrganizationForm(request.POST)
+        if form.is_valid():
+            organization = form.save(commit=False)
+            organization.tenant = tenant  # Powiąż organizację z tenantem
+            organization.save()
+            return redirect('tenant_detail', tenant_id=tenant.tenant_id)  # Przeładuj widok szczegółów tenanta
+    else:
+        form = OrganizationForm()
+
+    return render(request, 'core/tenant_detail.html', {
+        'tenant': tenant,
+        'organizations': organizations,
+        'form': form,
+    })

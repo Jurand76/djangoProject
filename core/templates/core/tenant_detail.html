@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Tenant Details: {{ tenant.domain }}</h2>
+    <p><strong>Tenant ID:</strong> {{ tenant.tenant_id }}</p>
+
+    <h3>Organizations under this Tenant:</h3>
+    {% if organizations %}
+        <ul class="list-group mt-3">
+            {% for organization in organizations %}
+                <li class="list-group-item">{{ organization.name }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No organizations found for this tenant.</p>
+    {% endif %}
+
+    <h3 class="mt-5">Add New Organization</h3>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Add Organization</button>
+    </form>
+
+    <a href="/tenants/" class="btn btn-secondary mt-4">Back to Tenants</a>
+</div>
+{% endblock %}

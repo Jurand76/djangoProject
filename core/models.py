@@ -6,7 +6,7 @@ class Tenant(models.Model):
     domain = models.CharField(max_length=255, unique=True)
 
 class Organization(models.Model):
-    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='organizations')
     name = models.CharField(max_length=255)
 
 class Department(models.Model):
