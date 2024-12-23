@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Add New Tenant</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="domain" class="form-label">Tenant Domain</label>
+            <input type="text" name="domain" class="form-control" id="domain" placeholder="e.g., tenant1.localhost">
+        </div>
+        <button type="submit" class="btn btn-primary">Add Tenant</button>
+    </form>
+</div>
+{% endblock %}

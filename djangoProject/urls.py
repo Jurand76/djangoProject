@@ -17,8 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from core.views import TenantViewSet, OrganizationViewSet, DepartmentViewSet, CustomerViewSet
+from core.views import TenantViewSet, OrganizationViewSet, DepartmentViewSet, CustomerViewSet, homepage
 from core.admin import custom_admin_site
+from django.contrib.auth import views as auth_views
+from core import views
 
 router = DefaultRouter()
 router.register(r'tenants', TenantViewSet)
@@ -27,6 +29,12 @@ router.register(r'departments', DepartmentViewSet)
 router.register(r'customers', CustomerViewSet)
 
 urlpatterns = [
+    path('', homepage, name='homepage'),
+    path('login/', auth_views.LoginView.as_view(template_name='core/login.html'), name='login'),  # Login
+    path('logout/', auth_views.LogoutView.as_view(template_name='core/logout.html', next_page='login'), name='logout'),  # Logout
+    path('core/', include('core.urls')),
+    path('tenants/', views.tenant_list, name='tenant_list'),  # Lista tenantów
+    path('tenants/add/', views.add_tenant, name='add_tenant'),  # Dodawanie tenantów
     path('admin/', custom_admin_site.urls),
-    path('api/', include('core.urls')),
+    path('api/', include('core.urls'))
 ]
