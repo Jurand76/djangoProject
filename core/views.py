@@ -16,6 +16,7 @@ class TenantViewSet(viewsets.ModelViewSet):
     queryset = Tenant.objects.all()
     serializer_class = TenantSerializer
 
+
 class OrganizationViewSet(viewsets.ModelViewSet):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
@@ -24,11 +25,10 @@ class OrganizationViewSet(viewsets.ModelViewSet):
         openapi.Parameter(
             'tenant_id',
             openapi.IN_QUERY,
-            description="ID Tenanta (UUID)",
+            description="ID of tenant (UUID)",
             type=openapi.TYPE_STRING,
         )
     ])
-
     def get_queryset(self):
         tenant_id = self.request.query_params.get('tenant_id')
         if tenant_id:
@@ -38,6 +38,7 @@ class OrganizationViewSet(viewsets.ModelViewSet):
         if tenant is None:
             return Organization.objects.none()
         return Organization.objects.filter(tenant=tenant)
+
 
 class DepartmentViewSet(viewsets.ModelViewSet):
     queryset = Department.objects.all()
@@ -55,7 +56,6 @@ class DepartmentViewSet(viewsets.ModelViewSet):
         return Department.objects.filter(tenant=tenant)
 
 
-
 class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
@@ -65,7 +65,9 @@ class CustomerViewSet(viewsets.ModelViewSet):
         organization_id = self.request.query_params.get('organization_id')
         department_id = self.request.query_params.get('department_id')
         if tenant_id and organization_id and department_id:
-            return Customer.objects.filter(department__organization__tenant__tenant_id=tenant_id, department__organization_id=organization_id, department_id=department_id)
+            return Customer.objects.filter(department__organization__tenant__tenant_id=tenant_id,
+                                           department__organization_id=organization_id,
+                                           department_id=department_id)
 
         tenant = self.request.tenant
         if tenant is None:
@@ -80,6 +82,7 @@ def homepage(request):
         'tenants': tenants,
         'is_admin': is_admin,
     })
+
 
 @login_required
 def tenant_list(request):
@@ -96,6 +99,7 @@ def add_tenant(request):
             return redirect('tenant_list')
     return render(request, 'core/add_tenant.html')
 
+
 def tenant_detail(request, tenant_id):
     # Get tenant
     tenant = get_object_or_404(Tenant, tenant_id=tenant_id)
@@ -107,6 +111,7 @@ def tenant_detail(request, tenant_id):
         'organizations': organizations,
     })
 
+
 def organization_detail(request, organization_id):
     # Get organization
     organization = get_object_or_404(Organization, id=organization_id)
@@ -117,6 +122,7 @@ def organization_detail(request, organization_id):
         'departments': departments,
     })
 
+
 def add_organization(request, tenant_id):
     # Get tenant based at tenant_id
     tenant = get_object_or_404(Tenant, tenant_id=tenant_id)
@@ -124,12 +130,13 @@ def add_organization(request, tenant_id):
         form = OrganizationForm(request.POST)
         if form.is_valid():
             organization = form.save(commit=False)
-            organization.tenant = tenant  # Powiąż organizację z tenantem
+            organization.tenant = tenant  # Join organization with tenant
             organization.save()
             return redirect('tenant_detail', tenant_id=tenant.tenant_id)
     else:
         form = OrganizationForm()
     return render(request, 'core/add_organization.html', {'form': form, 'tenant': tenant})
+
 
 def edit_organization(request, organization_id):
     organization = get_object_or_404(Organization, id=organization_id)
@@ -142,6 +149,7 @@ def edit_organization(request, organization_id):
         form = OrganizationForm(instance=organization)
     return render(request, 'core/edit_organization.html', {'form': form, 'organization': organization})
 
+
 def delete_organization(request, organization_id):
     organization = get_object_or_404(Organization, id=organization_id)
     if request.method == 'POST':
@@ -149,6 +157,7 @@ def delete_organization(request, organization_id):
         organization.delete()
         return redirect('tenant_detail', tenant_id=tenant_id)
     return render(request, 'core/delete_organization.html', {'organization': organization})
+
 
 def department_detail(request, department_id):
     # Get department
@@ -160,18 +169,20 @@ def department_detail(request, department_id):
         'customers': customers,
     })
 
+
 def add_department(request, organization_id):
     organization = get_object_or_404(Organization, id=organization_id)
     if request.method == 'POST':
         form = DepartmentForm(request.POST)
         if form.is_valid():
             department = form.save(commit=False)
-            department.organization = organization  # Powiąż dział z organizacją
+            department.organization = organization  # Join department with organization
             department.save()
             return redirect('organization_detail', organization_id=organization.id)
     else:
         form = DepartmentForm()
     return render(request, 'core/add_department.html', {'form': form, 'organization': organization})
+
 
 def edit_department(request, department_id):
     department = get_object_or_404(Department, id=department_id)
@@ -193,6 +204,7 @@ def delete_department(request, department_id):
         return redirect('organization_detail', organization_id=organization_id)
     return render(request, 'core/delete_department.html', {'department': department})
 
+
 def add_customer(request, department_id):
     department = get_object_or_404(Department, id=department_id)
     if request.method == 'POST':
@@ -206,6 +218,7 @@ def add_customer(request, department_id):
         form = CustomerForm()
     return render(request, 'core/add_customer.html', {'form': form, 'department': department})
 
+
 def edit_customer(request, customer_id):
     customer = get_object_or_404(Customer, id=customer_id)
     if request.method == 'POST':
@@ -216,6 +229,7 @@ def edit_customer(request, customer_id):
     else:
         form = CustomerForm(instance=customer)
     return render(request, 'core/edit_customer.html', {'form': form, 'customer': customer})
+
 
 def delete_customer(request, customer_id):
     customer = get_object_or_404(Customer, id=customer_id)
