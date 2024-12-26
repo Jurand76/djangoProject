@@ -16,7 +16,7 @@
                     <div>
                         <strong>{{ customer.name }}</strong> ({{ customer.email }})
                     </div>
-                    <div>
+                    <div class="btn-group" role="group">
                         <a href="{% url 'edit_customer' customer.id %}" class="btn btn-sm btn-warning">Edit</a>
                         <a href="{% url 'delete_customer' customer.id %}" class="btn btn-sm btn-danger">Delete</a>
                     </div>

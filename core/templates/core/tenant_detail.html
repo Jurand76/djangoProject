@@ -8,15 +8,20 @@
     <p><strong>Tenant ID:</strong> {{ tenant.tenant_id }}</p>
     <br>
 
+
     <h3>Organizations under this Tenant:</h3>
     <p>(click to choose organization)</p>
-    {% if organizations %}
+     {% if organizations %}
         <ul class="list-group mt-3">
             {% for organization in organizations %}
-                <li class="list-group-item organization-item">
-                    <a href="{% url 'organization_detail' organization.id %}" class="text-decoration-none text-dark">
+                <li class="list-group-item organization-item d-flex justify-content-between align-items-center">
+                    <a href="{% url 'organization_detail' organization.id %}" class="text-decoration-none text-dark flex-grow-1">
                         {{ organization.name }}
                     </a>
+                    <div class="btn-group" role="group">
+                        <a href="{% url 'edit_organization' organization.id %}" class="btn btn-sm btn-warning">Edit</a>
+                        <a href="{% url 'delete_organization' organization.id %}" class="btn btn-sm btn-danger">Delete</a>
+                    </div>
                 </li>
             {% endfor %}
         </ul>
@@ -24,20 +29,26 @@
         <p>No organizations found for this tenant.</p>
     {% endif %}
 
-    <h3 class="mt-5">Add New Organization</h3>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Add Organization</button>
-    </form>
+    <br>
+    <div class="mt-3">
+        <a href="{% url 'add_organization' tenant.tenant_id %}" class="btn btn-primary mt-3">Add Organization</a>
+        <a href="/api/tenants/" class="btn btn-secondary mt-3">Back to Tenants</a>
+    </div>
 
-    <a href="/tenants/" class="btn btn-secondary mt-4">Back to Tenants</a>
 </div>
 
 <style>
-    .organization-item:hover {
-        background-color: #f8f9fa; /* Jasnoszare tło */
+    .organization-item {
         cursor: pointer;
+    }
+
+    .organization-item:hover {
+        background-color: #f2f7f4; /* Light gray background */
+    }
+
+    .organization-item a {
+        display: block;
+        width: 100%; /* Link width 100% of element */
     }
 </style>
 {% endblock %}

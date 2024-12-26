@@ -9,7 +9,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from django.contrib.auth.decorators import login_required
 from django.template.loader import get_template
-from core.forms import OrganizationForm, CustomerForm
+from core.forms import OrganizationForm, CustomerForm, DepartmentForm
 
 
 class TenantViewSet(viewsets.ModelViewSet):
@@ -120,6 +120,39 @@ def organization_detail(request, organization_id):
         'departments': departments,
     })
 
+def add_organization(request, tenant_id):
+    # Pobierz tenant na podstawie tenant_id
+    tenant = get_object_or_404(Tenant, tenant_id=tenant_id)
+    if request.method == 'POST':
+        form = OrganizationForm(request.POST)
+        if form.is_valid():
+            organization = form.save(commit=False)
+            organization.tenant = tenant  # Powiąż organizację z tenantem
+            organization.save()
+            return redirect('tenant_detail', tenant_id=tenant.tenant_id)
+    else:
+        form = OrganizationForm()
+    return render(request, 'core/add_organization.html', {'form': form, 'tenant': tenant})
+
+def edit_organization(request, organization_id):
+    organization = get_object_or_404(Organization, id=organization_id)
+    if request.method == 'POST':
+        form = OrganizationForm(request.POST, instance=organization)
+        if form.is_valid():
+            form.save()
+            return redirect('tenant_detail', tenant_id=organization.tenant.tenant_id)
+    else:
+        form = OrganizationForm(instance=organization)
+    return render(request, 'core/edit_organization.html', {'form': form, 'organization': organization})
+
+def delete_organization(request, organization_id):
+    organization = get_object_or_404(Organization, id=organization_id)
+    if request.method == 'POST':
+        tenant_id = organization.tenant.tenant_id
+        organization.delete()
+        return redirect('tenant_detail', tenant_id=tenant_id)
+    return render(request, 'core/delete_organization.html', {'organization': organization})
+
 def department_detail(request, department_id):
     # Get department
     department = get_object_or_404(Department, id=department_id)
@@ -129,6 +162,39 @@ def department_detail(request, department_id):
         'department': department,
         'customers': customers,
     })
+
+def add_department(request, organization_id):
+    organization = get_object_or_404(Organization, id=organization_id)
+    if request.method == 'POST':
+        form = DepartmentForm(request.POST)
+        if form.is_valid():
+            department = form.save(commit=False)
+            department.organization = organization  # Powiąż dział z organizacją
+            department.save()
+            return redirect('organization_detail', organization_id=organization.id)
+    else:
+        form = DepartmentForm()
+    return render(request, 'core/add_department.html', {'form': form, 'organization': organization})
+
+def edit_department(request, department_id):
+    department = get_object_or_404(Department, id=department_id)
+    if request.method == 'POST':
+        form = DepartmentForm(request.POST, instance=department)
+        if form.is_valid():
+            form.save()
+            return redirect('organization_detail', organization_id=department.organization.id)
+    else:
+        form = DepartmentForm(instance=department)
+    return render(request, 'core/edit_department.html', {'form': form, 'department': department})
+
+
+def delete_department(request, department_id):
+    department = get_object_or_404(Department, id=department_id)
+    if request.method == 'POST':
+        organization_id = department.organization.id
+        department.delete()
+        return redirect('organization_detail', organization_id=organization_id)
+    return render(request, 'core/delete_department.html', {'department': department})
 
 def add_customer(request, department_id):
     department = get_object_or_404(Department, id=department_id)

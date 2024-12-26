@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Add Organization to Tenant: {{ tenant.domain }}</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Add Organization</button>
+        <a href="{% url 'tenant_detail' tenant.tenant_id %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

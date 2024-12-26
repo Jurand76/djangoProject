@@ -1,5 +1,5 @@
 from django import forms
-from core.models import Organization, Customer
+from core.models import Organization, Customer, Department
 
 class OrganizationForm(forms.ModelForm):
     class Meta:
@@ -9,4 +9,9 @@ class OrganizationForm(forms.ModelForm):
 class CustomerForm(forms.ModelForm):
     class Meta:
         model = Customer
-        fields = ['name', 'email']  # Pola, które użytkownik może edytować
+        fields = ['name', 'email']  # Customer name and email
+
+class DepartmentForm(forms.ModelForm):
+    class Meta:
+        model = Department
+        fields = ['name']           # Deparment name
