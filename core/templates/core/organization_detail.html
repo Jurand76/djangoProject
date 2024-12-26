@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Organization Details</h2>
+    <p><strong>Organization name:</strong> {{ organization.name }}</p>
+    <p><strong>Organization ID:</strong> {{ organization.id }}</p>
+    <p><strong>Organization tenant:</strong> {{ organization.tenant.domain }}</p>
+
+    <h3 class="mt-5">Departments in this Organization:</h3>
+    <p>(click to choose department)</p>
+    {% if departments %}
+        <ul class="list-group mt-3">
+            {% for department in departments %}
+                <li class="list-group-item department-item">
+                    <a href="{% url 'department_detail' department.id %}" class="text-decoration-none text-dark">
+                        {{ department.name }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No departments found for this organization.</p>
+    {% endif %}
+
+    <a href="{% url 'tenant_detail' organization.tenant.tenant_id %}" class="btn btn-secondary mt-4">Back to Tenant</a>
+</div>
+
+<style>
+    .department-item:hover {
+        background-color: #f8f9fa; /* Jasnoszare tło */
+        cursor: pointer;
+    }
+</style>
+{% endblock %}

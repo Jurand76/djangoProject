@@ -9,7 +9,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from django.contrib.auth.decorators import login_required
 from django.template.loader import get_template
-from core.forms import OrganizationForm
+from core.forms import OrganizationForm, CustomerForm
 
 
 class TenantViewSet(viewsets.ModelViewSet):
@@ -57,7 +57,12 @@ class CustomerViewSet(viewsets.ModelViewSet):
 
 
 def homepage(request):
-    return render(request, 'core/homepage.html')
+    tenants = Tenant.objects.all()  # Pobierz wszystkie tenanty
+    is_admin = request.user.is_authenticated and request.user.is_staff  # Check if user has admin privileges
+    return render(request, 'core/homepage.html', {
+        'tenants': tenants,
+        'is_admin': is_admin,
+    })
 
 @login_required
 def tenant_list(request):
@@ -74,13 +79,13 @@ def add_tenant(request):
             return redirect('tenant_list')
     return render(request, 'core/add_tenant.html')
 
-def homepage(request):
-    try:
-        template = get_template('base.html')
-        print(f"Template found: {template}")
-    except Exception as e:
-        print(f"Error: {e}")
-    return render(request, 'core/homepage.html')
+#def homepage(request):
+#    try:
+#        template = get_template('base.html')
+#        print(f"Template found: {template}")
+#    except Exception as e:
+#        print(f"Error: {e}")
+#    return render(request, 'core/homepage.html')
 
 def tenant_detail(request, tenant_id):
     # Get tenant
@@ -104,3 +109,55 @@ def tenant_detail(request, tenant_id):
         'organizations': organizations,
         'form': form,
     })
+
+def organization_detail(request, organization_id):
+    # Get organization
+    organization = get_object_or_404(Organization, id=organization_id)
+    # Get departments for organization
+    departments = organization.departments.all()
+    return render(request, 'core/organization_detail.html', {
+        'organization': organization,
+        'departments': departments,
+    })
+
+def department_detail(request, department_id):
+    # Get department
+    department = get_object_or_404(Department, id=department_id)
+    # Get customers list
+    customers = department.customers.all()
+    return render(request, 'core/department_detail.html', {
+        'department': department,
+        'customers': customers,
+    })
+
+def add_customer(request, department_id):
+    department = get_object_or_404(Department, id=department_id)
+    if request.method == 'POST':
+        form = CustomerForm(request.POST)
+        if form.is_valid():
+            customer = form.save(commit=False)
+            customer.department = department
+            customer.save()
+            return redirect('department_detail', department_id=department.id)
+    else:
+        form = CustomerForm()
+    return render(request, 'core/add_customer.html', {'form': form, 'department': department})
+
+def edit_customer(request, customer_id):
+    customer = get_object_or_404(Customer, id=customer_id)
+    if request.method == 'POST':
+        form = CustomerForm(request.POST, instance=customer)
+        if form.is_valid():
+            form.save()
+            return redirect('department_detail', department_id=customer.department.id)
+    else:
+        form = CustomerForm(instance=customer)
+    return render(request, 'core/edit_customer.html', {'form': form, 'customer': customer})
+
+def delete_customer(request, customer_id):
+    customer = get_object_or_404(Customer, id=customer_id)
+    if request.method == 'POST':
+        department_id = customer.department.id
+        customer.delete()
+        return redirect('department_detail', department_id=department_id)
+    return render(request, 'core/delete_customer.html', {'customer': customer})

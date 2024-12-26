@@ -42,7 +42,11 @@ urlpatterns = [
     path('tenants/add/', views.add_tenant, name='add_tenant'),  # Adding tenants
     path('tenants/<uuid:tenant_id>/', views.tenant_detail, name='tenant_detail'),  # Widok dashboard
     path('tenants/', views.tenant_list, name='tenant_list'),
-
+    path('organizations/<int:organization_id>/', views.organization_detail, name='organization_detail'),
+    path('departments/<int:department_id>/', views.department_detail, name='department_detail'),
+    path('departments/<int:department_id>/add_customer/', views.add_customer, name='add_customer'),
+    path('customers/<int:customer_id>/edit/', views.edit_customer, name='edit_customer'),
+    path('customers/<int:customer_id>/delete/', views.delete_customer, name='delete_customer'),
 
 ]
 

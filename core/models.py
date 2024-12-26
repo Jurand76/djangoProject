@@ -10,10 +10,10 @@ class Organization(models.Model):
     name = models.CharField(max_length=255)
 
 class Department(models.Model):
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='departments')
     name = models.CharField(max_length=255)
 
 class Customer(models.Model):
-    department = models.ForeignKey(Department, on_delete=models.CASCADE)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='customers')
     name = models.CharField(max_length=255)
     email = models.EmailField()

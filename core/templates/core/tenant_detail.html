@@ -2,14 +2,22 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2>Tenant Details: {{ tenant.domain }}</h2>
+    <h2>Tenant Details:</h2>
+    <br>
+    <p><strong>Tenant domain:</strong> {{ tenant.domain }}</p>
     <p><strong>Tenant ID:</strong> {{ tenant.tenant_id }}</p>
+    <br>
 
     <h3>Organizations under this Tenant:</h3>
+    <p>(click to choose organization)</p>
     {% if organizations %}
         <ul class="list-group mt-3">
             {% for organization in organizations %}
-                <li class="list-group-item">{{ organization.name }}</li>
+                <li class="list-group-item organization-item">
+                    <a href="{% url 'organization_detail' organization.id %}" class="text-decoration-none text-dark">
+                        {{ organization.name }}
+                    </a>
+                </li>
             {% endfor %}
         </ul>
     {% else %}
@@ -25,4 +33,11 @@
 
     <a href="/tenants/" class="btn btn-secondary mt-4">Back to Tenants</a>
 </div>
+
+<style>
+    .organization-item:hover {
+        background-color: #f8f9fa; /* Jasnoszare tło */
+        cursor: pointer;
+    }
+</style>
 {% endblock %}
