@@ -30,6 +30,10 @@ class OrganizationViewSet(viewsets.ModelViewSet):
     ])
 
     def get_queryset(self):
+        tenant_id = self.request.query_params.get('tenant_id')
+        if tenant_id:
+            return Organization.objects.filter(tenant__tenant_id=tenant_id)
+
         tenant = self.request.tenant
         if tenant is None:
             return Organization.objects.none()
@@ -40,16 +44,29 @@ class DepartmentViewSet(viewsets.ModelViewSet):
     serializer_class = DepartmentSerializer
 
     def get_queryset(self):
+        tenant_id = self.request.query_params.get('tenant_id')
+        organization_id = self.request.query_params.get('organization_id')
+        if tenant_id and organization_id:
+            return Department.objects.filter(organization__tenant__tenant_id=tenant_id, organization_id=organization_id)
+
         tenant = self.request.tenant
         if tenant is None:
             return Department.objects.none()
         return Department.objects.filter(tenant=tenant)
+
+
 
 class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
 
     def get_queryset(self):
+        tenant_id = self.request.query_params.get('tenant_id')
+        organization_id = self.request.query_params.get('organization_id')
+        department_id = self.request.query_params.get('department_id')
+        if tenant_id and organization_id and department_id:
+            return Customer.objects.filter(department__organization__tenant__tenant_id=tenant_id, department__organization_id=organization_id, department_id=department_id)
+
         tenant = self.request.tenant
         if tenant is None:
             return Customer.objects.none()
@@ -57,7 +74,7 @@ class CustomerViewSet(viewsets.ModelViewSet):
 
 
 def homepage(request):
-    tenants = Tenant.objects.all()  # Pobierz wszystkie tenanty
+    tenants = Tenant.objects.all()  # Get all tenants
     is_admin = request.user.is_authenticated and request.user.is_staff  # Check if user has admin privileges
     return render(request, 'core/homepage.html', {
         'tenants': tenants,
@@ -79,35 +96,15 @@ def add_tenant(request):
             return redirect('tenant_list')
     return render(request, 'core/add_tenant.html')
 
-#def homepage(request):
-#    try:
-#        template = get_template('base.html')
-#        print(f"Template found: {template}")
-#    except Exception as e:
-#        print(f"Error: {e}")
-#    return render(request, 'core/homepage.html')
-
 def tenant_detail(request, tenant_id):
     # Get tenant
     tenant = get_object_or_404(Tenant, tenant_id=tenant_id)
     # Get organizations
     organizations = Organization.objects.filter(tenant=tenant)
 
-    # form to add new organization
-    if request.method == 'POST':
-        form = OrganizationForm(request.POST)
-        if form.is_valid():
-            organization = form.save(commit=False)
-            organization.tenant = tenant  # Powiąż organizację z tenantem
-            organization.save()
-            return redirect('tenant_detail', tenant_id=tenant.tenant_id)  # Przeładuj widok szczegółów tenanta
-    else:
-        form = OrganizationForm()
-
     return render(request, 'core/tenant_detail.html', {
         'tenant': tenant,
         'organizations': organizations,
-        'form': form,
     })
 
 def organization_detail(request, organization_id):
@@ -121,7 +118,7 @@ def organization_detail(request, organization_id):
     })
 
 def add_organization(request, tenant_id):
-    # Pobierz tenant na podstawie tenant_id
+    # Get tenant based at tenant_id
     tenant = get_object_or_404(Tenant, tenant_id=tenant_id)
     if request.method == 'POST':
         form = OrganizationForm(request.POST)

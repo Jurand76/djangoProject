@@ -32,9 +32,9 @@ urlpatterns = [
     path('', homepage, name='homepage'),
     path('login/', auth_views.LoginView.as_view(template_name='core/login.html'), name='login'),  # Login
     path('logout/', auth_views.LogoutView.as_view(next_page='homepage'), name='logout'),  # Logout
-    #path('core/', include('core.urls')),
+    path('core/', include('core.urls')),
     #path('tenants/', views.tenant_list, name='tenant_list'),  # Tenants list
     #path('tenants/add/', views.add_tenant, name='add_tenant'),  # Adding tenants
     path('admin/', custom_admin_site.urls),   # Admin site Django
-    path('api/', include('core.urls')),        # API from core.urls
+    path('api/', include(router.urls)),        # API from core.urls
 ]

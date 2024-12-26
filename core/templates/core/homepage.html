@@ -14,9 +14,9 @@
 
     {% if user.is_authenticated %}
         <div class="mt-4">
-            <a href="api/tenants/" class="btn btn-primary">Choose Tenant</a>
+            <a href="core/tenants/" class="btn btn-primary">Choose Tenant</a>
             {% if is_admin %}
-                <a href="/api/tenants/add/" class="btn btn-success">Add Tenant</a>
+                <a href="/core/tenants/add/" class="btn btn-success">Add Tenant</a>
             {% endif %}
         </div>
     {% else %}
