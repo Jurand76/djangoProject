@@ -7,7 +7,7 @@ from core.serializers.department import DepartmentSerializer
 from core.serializers.customer import CustomerSerializer
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from core.forms import OrganizationForm, CustomerForm, DepartmentForm
 
 
@@ -89,7 +89,7 @@ def tenant_list(request):
     return render(request, 'core/tenant_list.html', {'tenants': tenants})
 
 
-@login_required
+@permission_required('core.add_tenant', raise_exception=True)
 def add_tenant(request):
     if request.method == 'POST':
         domain = request.POST.get('domain')
@@ -122,6 +122,7 @@ def organization_detail(request, organization_id):
     })
 
 
+@permission_required('core.add_organization', raise_exception=True)
 def add_organization(request, tenant_id):
     # Get tenant based at tenant_id
     tenant = get_object_or_404(Tenant, tenant_id=tenant_id)
@@ -137,6 +138,7 @@ def add_organization(request, tenant_id):
     return render(request, 'core/add_organization.html', {'form': form, 'tenant': tenant})
 
 
+@permission_required('core.edit_organization', raise_exception=True)
 def edit_organization(request, organization_id):
     organization = get_object_or_404(Organization, id=organization_id)
     if request.method == 'POST':
@@ -149,6 +151,7 @@ def edit_organization(request, organization_id):
     return render(request, 'core/edit_organization.html', {'form': form, 'organization': organization})
 
 
+@permission_required('core.delete_organization', raise_exception=True)
 def delete_organization(request, organization_id):
     organization = get_object_or_404(Organization, id=organization_id)
     if request.method == 'POST':
@@ -169,6 +172,7 @@ def department_detail(request, department_id):
     })
 
 
+@permission_required('core.add_department', raise_exception=True)
 def add_department(request, organization_id):
     organization = get_object_or_404(Organization, id=organization_id)
     if request.method == 'POST':
@@ -183,6 +187,7 @@ def add_department(request, organization_id):
     return render(request, 'core/add_department.html', {'form': form, 'organization': organization})
 
 
+@permission_required('core.edit_department', raise_exception=True)
 def edit_department(request, department_id):
     department = get_object_or_404(Department, id=department_id)
     if request.method == 'POST':
@@ -195,6 +200,7 @@ def edit_department(request, department_id):
     return render(request, 'core/edit_department.html', {'form': form, 'department': department})
 
 
+@permission_required('core.delete_department', raise_exception=True)
 def delete_department(request, department_id):
     department = get_object_or_404(Department, id=department_id)
     if request.method == 'POST':
@@ -204,6 +210,7 @@ def delete_department(request, department_id):
     return render(request, 'core/delete_department.html', {'department': department})
 
 
+@permission_required('core.add_customer', raise_exception=True)
 def add_customer(request, department_id):
     department = get_object_or_404(Department, id=department_id)
     if request.method == 'POST':
@@ -218,6 +225,7 @@ def add_customer(request, department_id):
     return render(request, 'core/add_customer.html', {'form': form, 'department': department})
 
 
+@permission_required('core.edit_customer', raise_exception=True)
 def edit_customer(request, customer_id):
     customer = get_object_or_404(Customer, id=customer_id)
     if request.method == 'POST':
@@ -230,6 +238,7 @@ def edit_customer(request, customer_id):
     return render(request, 'core/edit_customer.html', {'form': form, 'customer': customer})
 
 
+@permission_required('core.delete_customer', raise_exception=True)
 def delete_customer(request, customer_id):
     customer = get_object_or_404(Customer, id=customer_id)
     if request.method == 'POST':
