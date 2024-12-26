@@ -8,7 +8,6 @@ from core.serializers.customer import CustomerSerializer
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from django.contrib.auth.decorators import login_required
-from django.template.loader import get_template
 from core.forms import OrganizationForm, CustomerForm, DepartmentForm
 
 
