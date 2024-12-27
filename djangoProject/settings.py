@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-0g9wut8nkb#@+(r1ba@+48mzg#q-6%cw!7@plovs*lea=ldgq#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['pacific-hollows-88902-a75a2ddca59a.herokuapp.com', 'localhost']
 
 
 # Application definition
@@ -165,3 +165,7 @@ SIMPLE_JWT = {
     'SIGNING_KEY': SECRET_KEY,                    # signing key for JWT (default SECRET_KEY Django)
     'AUTH_HEADER_TYPES': ('Bearer',),             # type of authorisation in headers
 }
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://pacific-hollows-88902-a75a2ddca59a.herokuapp.com'
+]
